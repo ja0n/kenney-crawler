@@ -6,6 +6,7 @@ const urlBuilder = (page = 1, query = '') => ({
  transform: body => cheerio.load(body),
 });
 
+const surroundingsRegex = /[\])}[{(]/g;
 
 const findContentContainer = $ => $('.container').eq(2);
 
@@ -20,7 +21,6 @@ const metaExtractor = $ => {
   const nextPageAnchor = paginationRow.find('a').last();
   const pageAnchors = paginationRow.find('a').slice(1).slice(0, -1);
   const currentPageSpan = paginationRow.find('span.active');
-  debugger;
 
   return {
     'query': searchInput.val(),
@@ -28,6 +28,7 @@ const metaExtractor = $ => {
     'categories': categoryAnchors.map((index, anchor) => ({
       'label': $(anchor).text(),
       'url': $(anchor).attr('href'),
+      'id': $(anchor).attr('href').split('/assets?q=')[1] || '',
     })).get(),
     'pagination': {
       'previous_url': previousPageAnchor.attr('href'),
@@ -38,19 +39,19 @@ const metaExtractor = $ => {
   };
 };
 
-const resultsExtracor = $ => {
-  const assets = Array.from($('.col-md-12 a'));
+const resultsExtractor = $ => {
+  const assets = $('#content a.project');
   const regex = /url\((.*)\)/;
 
-  const data = assets.map((el) => {
+  const results = assets.map((el) => {
     const anchor = $(el);
 
     return {
       url: anchor.attr('href'),
-      thumbnail: regex.exec(anchor.find('> div').css('background-image'))[1],
-      label: anchor.find('> div > div:nth-child(1) > span').text(),
-      title: anchor.find('> div > div:nth-child(2) > h1').text(),
-      assets: anchor.find('> div > div:nth-child(2) > span').text(),
+      thumbnail: anchor.css('background-image').split('"')[1],
+      category: anchor.next().find('span.sub').text().trim().replace(surroundingsRegex, ''),
+      assets: anchor.find('.tag').text().replace(/[\t\na-z]/gi, ''),
+      title: anchor.next().get()[0].childNodes[0].nodeValue.trim(),
     };
   });
   return results;
@@ -63,7 +64,7 @@ module.exports = ({ page, query }) =>
 
         const data = {
           'meta': metaExtractor($),
-          'results': [],
+          'results': resultsExtractor($),
         };
 
         resolve(data);
