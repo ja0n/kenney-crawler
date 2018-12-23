@@ -1,6 +1,10 @@
-const surroundingsRegex = /[\])}[{(]/g;
+const $ = require('cheerio');
+
+const surroundings = /[\])}[{(]/g;
 
 const findContentContainer = $ => $('.container').eq(2);
+
+const removeChar = (str, char) => str.replace(char, '');
 
 const metaExtractor = $ => {
   const content = findContentContainer($);
@@ -37,16 +41,40 @@ const resultsExtractor = $ => {
 
   const results = assets.map((index, el) => {
     const anchor = $(el);
-
     return {
       url: anchor.attr('href'),
       thumbnail: anchor.css('background-image').split('"')[1],
-      category: anchor.next().find('span.sub').text().trim().replace(surroundingsRegex, ''),
-      assets: anchor.find('.tag').text().replace(/[a-z\t\n]/gi, ''),
-      title: anchor.next().get()[0].childNodes[0].nodeValue.trim(),
+      category: anchor.next().find('span.sub').text().trim().replace(surroundings, ''),
+      included_assets: anchor.find('.tag').text().replace(/[a-z\t\n]/gi, ''),
+      title: anchor.next().contents().eq(0).text().trim(),
     };
   }).get();
   return results;
 };
 
-module.exports = { metaExtractor, resultsExtractor };
+const getAttr = attr => (index, el) => $(el).attr(attr);
+const clearText = text => text.trim().replace(/[×\t\n]/gi, '');
+const getTextUrl = (index, el) => ({ text: $(el).text(), url: $(el).attr('href') });
+
+const assetExtractor = $ => {
+  const content = findContentContainer($);
+  const metaList = content.find('.float-left ul').first();
+  const downloadAnchor = content.find('.float-right a').first();
+  const rows = content.find('.row');
+
+  return {
+    download_url: downloadAnchor.attr('href'),
+    included_assets: clearText(metaList.children().eq(0).contents().eq(-1).text()),
+    size: metaList.children().eq(1).contents().eq(-1).text().trim(),
+    tags: metaList.children().eq(2).find('a').map(getTextUrl).get(),
+    name: rows.eq(0).children().eq(0).find('h1').first().text(),
+    description: rows.eq(0).children().eq(0).find('p').first().text(),
+    includes: rows.eq(0).children().eq(0).find('h3:contains(Includes)').next().text(),
+    preview: rows.eq(0).children().eq(-1).find('h3:contains(Preview)').first().siblings('a').map(getAttr('href')).get(),
+    more: rows.eq(1).children().eq(0).find('h3:contains(More)').next().find('a').map(getAttr('href')).get(),
+    license: clearText(rows.eq(1).children().eq(-1).find('h3:contains(License)').next().text()),
+    support: rows.eq(0).children().eq(0).find('.donate-list a').map(getTextUrl).get(),
+  };
+}
+
+module.exports = { metaExtractor, resultsExtractor, assetExtractor };

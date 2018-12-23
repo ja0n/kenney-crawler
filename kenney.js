@@ -1,24 +1,44 @@
 const request = require('request-promise');
 const cheerio = require('cheerio');
 
-const { metaExtractor, resultsExtractor } = require('./extractors');
+const { metaExtractor, resultsExtractor, assetExtractor } = require('./extractors');
 
-const urlBuilder = (page = 1, query = '') => ({
- uri: `https://kenney.nl/assets/page:${page}/?q=${query}`,
- transform: body => cheerio.load(body),
+const searchUrlBuilder = (page = 1, query = '') => ({
+  uri: `https://kenney.nl/assets/page:${page}/?q=${query}`,
+  transform: body => cheerio.load(body),
 });
 
-module.exports = ({ page, query }) =>
-  new Promise((resolve, reject) =>  {
-    request(urlBuilder(page, query))
-      .then($ => {
+const assetUrlBuilder = (assetId = '') => ({
+  uri: `https://kenney.nl/assets/${assetId}`,
+  transform: body => cheerio.load(body),
+});
 
-        const data = {
-          'meta': metaExtractor($),
-          'results': resultsExtractor($),
-        };
+const extractSearch = ({ page, query }) => new Promise((resolve, reject) => {
+  request(searchUrlBuilder(page, query))
+    .then($ => {
+      const data = {
+        'meta': metaExtractor($),
+        'results': resultsExtractor($),
+      };
 
-        resolve(data);
-      })
-      .catch(err => reject(err));
-  });
+      resolve(data);
+    })
+    .catch(err => reject(err));
+});
+
+const extractAsset = ({ assetId }) => {
+  return request(assetUrlBuilder(assetId))
+    .then($ => {
+      const data = {
+        'asset': assetExtractor($),
+      };
+
+      return data;
+    })
+};
+
+module.exports = {
+  search: extractSearch,
+  getAsset: extractAsset,
+  parseURL: () => null,
+};
