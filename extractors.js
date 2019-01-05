@@ -10,7 +10,7 @@ const metaExtractor = $ => {
   const content = findContentContainer($);
   const searchRow = content.children().first();
   const searchInput = searchRow.children().first().find('form input').first();
-  const randomAnchor = searchRow.children().first().contents('random');
+  const randomAnchor = searchRow.children().first().find('a:contains(random)');
   const categoryAnchors = searchRow.children().last().children('a');
   const paginationRow = content.children().last();
   const previousPageAnchor = paginationRow.find('a').first();
@@ -19,7 +19,7 @@ const metaExtractor = $ => {
   const currentPageSpan = paginationRow.find('span.active');
 
   return {
-    'query': searchInput.val(),
+    'query': searchInput.attr('placeholder'),
     'random': randomAnchor.attr('href'),
     'categories': categoryAnchors.map((index, anchor) => ({
       'label': $(anchor).text(),
@@ -27,10 +27,10 @@ const metaExtractor = $ => {
       'id': $(anchor).attr('href').split('/assets?q=')[1] || '',
     })).get(),
     'pagination': {
-      'previous_url': previousPageAnchor.attr('href'),
-      'next_url': nextPageAnchor.attr('href'),
-      'current_page': currentPageSpan.text(),
-      'total_pages': pageAnchors.last().text(),
+      'previous_url': previousPageAnchor.attr('href') || null,
+      'next_url': nextPageAnchor.attr('href') || null,
+      'current_page': currentPageSpan.text() * 1 || 1,
+      'total_pages': pageAnchors.last().text() * 1 || 1,
     },
   };
 };
@@ -45,7 +45,7 @@ const resultsExtractor = $ => {
       url: anchor.attr('href'),
       thumbnail: anchor.css('background-image').split('"')[1],
       category: anchor.next().find('span.sub').text().trim().replace(surroundings, ''),
-      included_assets: anchor.find('.tag').text().replace(/[a-z\t\n]/gi, ''),
+      included_assets: anchor.find('.tag').text().replace(/[a-z\t\n×]/gi, '') * 1,
       title: anchor.next().contents().eq(0).text().trim(),
     };
   }).get();

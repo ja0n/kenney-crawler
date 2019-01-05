@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const { metaExtractor, resultsExtractor, assetExtractor } = require('./extractors');
 
 const searchUrlBuilder = (page = 1, query = '') => ({
-  uri: `https://kenney.nl/assets/page:${page}/?q=${query}`,
+  uri: `https://kenney.nl/assets/page:${page}?s=${query}`,
   transform: body => cheerio.load(body),
 });
 
