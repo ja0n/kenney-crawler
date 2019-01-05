@@ -3,8 +3,8 @@ const cheerio = require('cheerio');
 
 const { metaExtractor, resultsExtractor, assetExtractor } = require('./extractors');
 
-const searchUrlBuilder = (page = 1, query = '') => ({
-  uri: `https://kenney.nl/assets/page:${page}?s=${query}`,
+const searchUrlBuilder = (page = 1, query = '', category= '') => ({
+  uri: `https://kenney.nl/assets/page:${page}?s=${query}&q=${category}`,
   transform: body => cheerio.load(body),
 });
 
@@ -13,8 +13,8 @@ const assetUrlBuilder = (assetId = '') => ({
   transform: body => cheerio.load(body),
 });
 
-const extractSearch = ({ page, query }) => new Promise((resolve, reject) => {
-  request(searchUrlBuilder(page, query))
+const extractSearch = ({ page, query, category }) => new Promise((resolve, reject) => {
+  request(searchUrlBuilder(page, query, category))
     .then($ => {
       const data = {
         'meta': metaExtractor($),
