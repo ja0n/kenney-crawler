@@ -53,7 +53,7 @@ const resultsExtractor = $ => {
 };
 
 const getAttr = attr => (index, el) => $(el).attr(attr);
-const clearText = text => text.trim().replace(/[×\t\n]/gi, '');
+const clearText = text => text.trim().replace(/[\t\n×]/gi, '');
 const getTextUrl = (index, el) => ({ text: $(el).text(), url: $(el).attr('href') });
 
 const assetExtractor = $ => {
@@ -64,7 +64,7 @@ const assetExtractor = $ => {
 
   return {
     download_url: downloadAnchor.attr('href'),
-    included_assets: clearText(metaList.children().eq(0).contents().eq(-1).text()),
+    included_assets: clearText(metaList.children().eq(0).contents().eq(-1).text()) * 1,
     size: metaList.children().eq(1).contents().eq(-1).text().trim(),
     tags: metaList.children().eq(2).find('a').map(getTextUrl).get(),
     name: rows.eq(0).children().eq(0).find('h1').first().text(),
