@@ -13,20 +13,33 @@ const assetUrlBuilder = (assetId = '') => ({
   transform: body => cheerio.load(body),
 });
 
-const extractSearch = ({ page, query, category }) => new Promise((resolve, reject) => {
-  request(searchUrlBuilder(page, query, category))
+/**
+ * Returns search data
+ * @param {Object} config
+ * @param {number} config.page - Page number
+ * @param {string} config.query - Query criteria
+ * @param {string} config.category - Category id ('2d', '3d', etc)
+ * @returns {Promise} Promise object represents the result of the crawling
+ */
+function extractSearch ({ page, query, category }) {
+  return request(searchUrlBuilder(page, query, category))
     .then($ => {
       const data = {
         'meta': metaExtractor($),
         'results': resultsExtractor($),
       };
 
-      resolve(data);
+      return data;
     })
-    .catch(err => reject(err));
-});
+}
 
-const extractAsset = ({ assetId }) => {
+/**
+ * Returns data about specific asset
+ * @param {Object} config
+ * @param {string} config.assetId - Asset id like 'platformer-kit' from  `https://kenney.nl/assets/platformer-kit`
+ * @returns {Promise} Promise object represents the result of the crawling
+ */
+function extractAsset ({ assetId }) {
   return request(assetUrlBuilder(assetId))
     .then($ => {
       const data = {
@@ -35,7 +48,7 @@ const extractAsset = ({ assetId }) => {
 
       return data;
     })
-};
+}
 
 module.exports = {
   search: extractSearch,
