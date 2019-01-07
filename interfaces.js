@@ -15,7 +15,7 @@ const assetUrlBuilder = (assetId = '') => ({
 
 /**
  * Returns search data
- * @param {Object} config
+ * @param {Object} config - Config object
  * @param {number} config.page - Page number
  * @param {string} config.query - Query criteria
  * @param {string} config.category - Category id ('2d', '3d', etc)
@@ -35,8 +35,8 @@ function extractSearch ({ page, query, category }) {
 
 /**
  * Returns data about specific asset
- * @param {Object} config
- * @param {string} config.assetId - Asset id like 'platformer-kit' from  `https://kenney.nl/assets/platformer-kit`
+ * @param {Object} config - Config object
+ * @param {string} config.assetId - Like the last section of `https://kenney.nl/assets/platformer-kit`
  * @returns {Promise} Promise object represents the result of the crawling
  */
 function extractAsset ({ assetId }) {

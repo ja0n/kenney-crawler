@@ -2,9 +2,12 @@
 Extract useful information from [kenney.nl](https://kenney.nl/)
 
 # Kenney
-> *Free game assets, no strings attached.*
+> **Free game assets, no strings attached.**
+
 > We've created over 40,000 images, audio files and 3D models for you to use in your projects. Thanks to our public domain license you're even allowed to use them in commercial projects!
-Kenney is an open initiative to distribute free game assets. Peep the [donation page](https://kenney.itch.io/kenney-donation)
+Kenney is an open initiative to distribute free game assets.
+
+Check the [donation page](https://kenney.itch.io/kenney-donation)
 
 ## Functions
 
@@ -27,7 +30,7 @@ Returns search data
 
 | Param | Type | Description |
 | --- | --- | --- |
-| config | <code>Object</code> |  |
+| config | <code>Object</code> | Config object |
 | config.page | <code>number</code> | Page number |
 | config.query | <code>string</code> | Query criteria |
 | config.category | <code>string</code> | Category id ('2d', '3d', etc) |
@@ -42,5 +45,6 @@ Returns data about specific asset
 
 | Param | Type | Description |
 | --- | --- | --- |
-| config | <code>Object</code> |  |
-| config.assetId | <code>string</code> | Asset id like 'platformer-kit' from  `https://kenney.nl/assets/platformer-kit` |
+| config | <code>Object</code> | Config object |
+| config.assetId | <code>string</code> | Like the last section of `https://kenney.nl/assets/platformer-kit` |
+
