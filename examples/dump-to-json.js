@@ -1,6 +1,6 @@
 const fs = require('fs');
 const flatten = require('array-flatten');
-const kenney = require('./index');
+const kenney = require('../');
 
 Promise.all([1, 2].map(n => kenney.search({ page: n })))
   .then(data => {
